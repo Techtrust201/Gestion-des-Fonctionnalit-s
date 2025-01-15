@@ -31,7 +31,6 @@ interface Category {
 }
 
 export default function GestionDesFonctionnalitesPage() {
-  // Données initiales
   const [data, setData] = useState<Category[]>([
     {
       title: "1. Gestion des Produits",
@@ -48,9 +47,6 @@ export default function GestionDesFonctionnalitesPage() {
     },
   ]);
 
-  // === Fonctions de mise à jour de la data ===
-
-  // Ajouter une nouvelle catégorie
   const addCategory = () => {
     setData((prev) => [
       ...prev,
@@ -61,7 +57,6 @@ export default function GestionDesFonctionnalitesPage() {
     ]);
   };
 
-  // Supprimer une catégorie
   const deleteCategory = (catIndex: number) => {
     setData((prev) => {
       const newData = [...prev];
@@ -70,7 +65,6 @@ export default function GestionDesFonctionnalitesPage() {
     });
   };
 
-  // Mettre à jour le titre d’une catégorie
   const updateCategoryTitle = (catIndex: number, newTitle: string) => {
     setData((prev) => {
       const newData = [...prev];
@@ -79,7 +73,6 @@ export default function GestionDesFonctionnalitesPage() {
     });
   };
 
-  // Ajouter une ligne (row) dans une catégorie
   const addRow = (catIndex: number) => {
     setData((prev) => {
       const newData = [...prev];
@@ -95,7 +88,6 @@ export default function GestionDesFonctionnalitesPage() {
     });
   };
 
-  // Supprimer une ligne (row)
   const deleteRow = (catIndex: number, rowIndex: number) => {
     setData((prev) => {
       const newData = [...prev];
@@ -104,7 +96,6 @@ export default function GestionDesFonctionnalitesPage() {
     });
   };
 
-  // Mettre à jour une cellule (feature, description, etc.)
   const updateRowValue = (
     catIndex: number,
     rowIndex: number,
@@ -120,7 +111,6 @@ export default function GestionDesFonctionnalitesPage() {
     });
   };
 
-  // Ajouter un acteur à une ligne
   const addActor = (catIndex: number, rowIndex: number) => {
     setData((prev) => {
       const newData = [...prev];
@@ -133,7 +123,6 @@ export default function GestionDesFonctionnalitesPage() {
     });
   };
 
-  // Mettre à jour un acteur
   const updateActor = (
     catIndex: number,
     rowIndex: number,
@@ -151,7 +140,6 @@ export default function GestionDesFonctionnalitesPage() {
     recalcTotal(catIndex, rowIndex);
   };
 
-  // Supprimer un acteur
   const deleteActor = (
     catIndex: number,
     rowIndex: number,
@@ -165,7 +153,6 @@ export default function GestionDesFonctionnalitesPage() {
     recalcTotal(catIndex, rowIndex);
   };
 
-  // Recalculer le total d’une ligne
   const recalcTotal = (catIndex: number, rowIndex: number) => {
     setData((prev) => {
       const newData = [...prev];
@@ -176,14 +163,12 @@ export default function GestionDesFonctionnalitesPage() {
     });
   };
 
-  // === Génération PDF ===
   const generatePDF = () => {
     const doc = new jsPDF();
 
-    // Charger le logo
-    const img = "/logo-techtrust-blue.png"; // Assurez-vous que le logo est accessible dans public
-    doc.addImage(img, "PNG", 10, 10, 40, 20); // Position x, y, largeur, hauteur
-    let currentY = 40; // Position initiale après le logo
+    const img = "/logo-techtrust-blue.png";
+    doc.addImage(img, "PNG", 10, 10, 40, 20);
+    let currentY = 40;
 
     data.forEach((cat) => {
       doc.setFont("courier", "normal");
@@ -201,7 +186,6 @@ export default function GestionDesFonctionnalitesPage() {
         `${row.totalCost} €`,
       ]);
 
-      // Configuration du tableau avec gestion du texte long
       doc.autoTable({
         startY: currentY,
         head: [
@@ -218,51 +202,49 @@ export default function GestionDesFonctionnalitesPage() {
         styles: {
           fontSize: 10,
           cellPadding: 3,
-          overflow: "linebreak", // Gère les retours à la ligne
+          overflow: "linebreak",
         },
         headStyles: {
-          fillColor: [15, 23, 42], // Navy pour l'entête
+          fillColor: [15, 23, 42],
         },
         columnStyles: {
-          0: { cellWidth: 30 }, // Largeur de la colonne "Fonctionnalité"
-          1: { cellWidth: 30 }, // Largeur de la colonne "Description"
-          2: { cellWidth: 20 }, // Largeur de la colonne "Criticité"
-          3: { cellWidth: 25 }, // Largeur de la colonne "Statut"
-          4: { cellWidth: 50 }, // Largeur de la colonne "Acteurs"
-          5: { cellWidth: 30 }, // Largeur de la colonne "Total Coût"
+          0: { cellWidth: 30 },
+          1: { cellWidth: 30 },
+          2: { cellWidth: 20 },
+          3: { cellWidth: 25 },
+          4: { cellWidth: 50 },
+          5: { cellWidth: 30 },
         },
         theme: "grid",
       });
 
-      // Mise à jour Y pour la prochaine catégorie
       currentY = doc.lastAutoTable.finalY + 10;
     });
 
     doc.save("Gestion_Fonctionnalites.pdf");
   };
 
-  // === Rendu JSX ===
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6">
-      <div className="mb-10">
+    <div className="mx-auto max-w-screen-lg px-4 py-6">
+      <div className="flex justify-between items-center mb-6">
         <Image
-          src="/logo-techtrust-blue.png" // Chemin vers le logo
+          src="/logo-techtrust-blue.png"
           alt="Logo"
           width={100}
           height={100}
-          className="mr-4" // Ajoute une marge droite
+          className="object-contain"
         />
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+          Gestion des Fonctionnalités
+        </h1>
       </div>
-      <h1 className="text-3xl font-bold mb-8 text-gray-800">
-        Gestion des Fonctionnalités
-      </h1>
 
-      <div className="flex flex-wrap gap-4 mb-8">
+      <div className="flex flex-wrap gap-4 mb-6">
         <Button
           onClick={addCategory}
           variant="primary"
           size="default"
-          // On peut custom className si besoin
+          className="text-sm px-3 py-2"
         >
           Ajouter une Catégorie
         </Button>
@@ -270,7 +252,7 @@ export default function GestionDesFonctionnalitesPage() {
           onClick={generatePDF}
           variant="secondary"
           size="default"
-          className="bg-secondary text-secondary-foreground"
+          className="text-sm px-3 py-2"
         >
           Générer le PDF
         </Button>
@@ -284,51 +266,47 @@ export default function GestionDesFonctionnalitesPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.3 }}
-            className="mb-8 rounded-lg bg-white shadow"
+            className="mb-6 rounded-lg bg-white shadow-lg overflow-hidden"
           >
-            {/* Header de catégorie */}
-            <div className="flex justify-between items-center p-4 border-b border-gray-200 rounded-t-lg bg-primary text-primary-foreground">
+            <div className="flex flex-col sm:flex-row justify-between items-center p-4 border-b border-gray-200 bg-primary text-primary-foreground">
               <input
                 type="text"
                 value={category.title}
                 onChange={(e) => updateCategoryTitle(catIndex, e.target.value)}
-                className="font-bold text-xl w-full mr-4 bg-transparent border-none outline-none"
+                className="text-sm sm:text-base font-bold w-full bg-transparent border-none outline-none"
               />
               <Button
                 onClick={() => deleteCategory(catIndex)}
                 variant="destructive"
                 size="sm"
-                className="w-[20vw]"
+                className="md:w-[20vw] mt-2 sm:mt-0 text-sm px-4 py-2 flex items-center justify-center"
               >
                 <FaTrash className="mr-2" />
-                Supprimer Catégorie
+                Supprimer la categorie
               </Button>
             </div>
 
-            {/* Tableau */}
-            <div className="overflow-x-auto p-4">
+            <div className="overflow-x-auto">
               <table className="min-w-full table-auto">
                 <thead>
                   <tr className="bg-primary text-primary-foreground">
-                    <th className="px-4 py-2">Fonctionnalité</th>
-                    <th className="px-4 py-2">Description</th>
-                    <th className="px-4 py-2">Criticité</th>
-                    <th className="px-4 py-2">Statut</th>
-                    <th className="px-4 py-2">Acteurs</th>
-                    <th className="px-4 py-2">Total Coût</th>
-                    <th className="px-4 py-2">Actions</th>
+                    <th className="px-2 py-2 text-left text-sm">
+                      Fonctionnalité
+                    </th>
+                    <th className="px-2 py-2 text-left text-sm">Description</th>
+                    <th className="px-2 py-2 text-left text-sm">Criticité</th>
+                    <th className="px-2 py-2 text-left text-sm">Statut</th>
+                    <th className="px-2 py-2 text-left text-sm">Acteurs</th>
+                    <th className="px-2 py-2 text-left text-sm">Total Coût</th>
+                    <th className="px-2 py-2 text-left text-sm">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {category.rows.map((row, rowIndex) => (
-                    <tr
-                      key={rowIndex}
-                      className="border-b last:border-none hover:bg-gray-50"
-                    >
-                      {/* Feature */}
-                      <td className="px-4 py-3 align-top">
+                    <tr key={rowIndex} className="border-b hover:bg-gray-50">
+                      <td className="px-2 py-2 text-sm">
                         <textarea
-                          className="w-full border border-gray-200 p-2 rounded resize-none focus:outline-none focus:ring-2 focus:ring-accent"
+                          className="w-full border border-gray-300 p-2 rounded resize-none text-sm"
                           value={row.feature}
                           onChange={(e) =>
                             updateRowValue(
@@ -338,14 +316,11 @@ export default function GestionDesFonctionnalitesPage() {
                               e.target.value
                             )
                           }
-                          rows={2}
                         />
                       </td>
-
-                      {/* Description */}
-                      <td className="px-4 py-3 align-top">
+                      <td className="px-2 py-2 text-sm">
                         <textarea
-                          className="w-full border border-gray-200 p-2 rounded resize-none focus:outline-none focus:ring-2 focus:ring-accent"
+                          className="w-full border border-gray-300 p-2 rounded resize-none text-sm"
                           value={row.description}
                           onChange={(e) =>
                             updateRowValue(
@@ -355,13 +330,10 @@ export default function GestionDesFonctionnalitesPage() {
                               e.target.value
                             )
                           }
-                          rows={2}
                         />
                       </td>
-
-                      {/* Criticité (rating) */}
-                      <td className="px-4 py-3 align-top">
-                        <div className="flex items-center gap-1">
+                      <td className="px-2 py-2 text-sm">
+                        <div className="flex gap-1">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <FaStar
                               key={star}
@@ -379,11 +351,9 @@ export default function GestionDesFonctionnalitesPage() {
                           ))}
                         </div>
                       </td>
-
-                      {/* Statut (select) */}
-                      <td className="px-4 py-3 align-top">
+                      <td className="px-2 py-2 text-sm">
                         <select
-                          className="w-full border border-gray-200 w-[9vw] p-2 rounded focus:outline-none focus:ring-2 focus:ring-accent"
+                          className="w-full border border-gray-300 p-2 rounded text-sm"
                           value={row.statut}
                           onChange={(e) =>
                             updateRowValue(
@@ -398,9 +368,7 @@ export default function GestionDesFonctionnalitesPage() {
                           <option value="Optionnel">Optionnel</option>
                         </select>
                       </td>
-
-                      {/* Acteurs */}
-                      <td className="px-4 py-3 align-top">
+                      <td className="px-2 py-2 text-sm">
                         {row.acteurs.map((actor, actorIndex) => (
                           <ActorRow
                             key={actorIndex}
@@ -412,7 +380,6 @@ export default function GestionDesFonctionnalitesPage() {
                             deleteActor={deleteActor}
                           />
                         ))}
-
                         <Button
                           onClick={() => addActor(catIndex, rowIndex)}
                           variant="accent"
@@ -422,21 +389,16 @@ export default function GestionDesFonctionnalitesPage() {
                           + Ajouter Acteur
                         </Button>
                       </td>
-
-                      {/* Total Cost */}
-                      <td className="px-4 py-3 align-top font-semibold">
+                      <td className="px-2 py-2 text-sm font-semibold">
                         {row.totalCost} €
                       </td>
-
-                      {/* Actions */}
-                      <td className="px-4 py-3 align-top">
+                      <td className="px-2 py-2 text-sm">
                         <Button
                           onClick={() => deleteRow(catIndex, rowIndex)}
                           variant="destructive"
                           size="sm"
                         >
-                          <FaTrash className="mr-2" />
-                          Supprimer
+                          <FaTrash className="mr-2" /> Supprimer
                         </Button>
                       </td>
                     </tr>
@@ -445,7 +407,7 @@ export default function GestionDesFonctionnalitesPage() {
               </table>
             </div>
 
-            <div className="px-4 pb-4">
+            <div className="p-4">
               <Button
                 onClick={() => addRow(catIndex)}
                 variant="primary"
