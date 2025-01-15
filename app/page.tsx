@@ -8,6 +8,7 @@ import { FaStar, FaTrash } from "react-icons/fa";
 import { Button } from "../components/Button";
 import ActorRow from "../components/ActorRow";
 import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
 
 interface Actor {
   actor: string;
@@ -36,22 +37,12 @@ export default function GestionDesFonctionnalitesPage() {
       title: "1. Gestion des Produits",
       rows: [
         {
-          feature: "Création, Modification, Suppression",
-          description:
-            "CRUD basique pour gérer les produits dans la base de données.",
-          criticite: 5,
+          feature: "",
+          description: "",
+          criticite: 0,
           statut: "Obligatoire",
-          acteurs: [{ actor: "Développeur", role: "Dev", cost: 100 }],
-          totalCost: 100,
-        },
-        {
-          feature: "Gestion des Variantes",
-          description:
-            "Permettre plusieurs variantes d’un produit (taille, couleur).",
-          criticite: 5,
-          statut: "Obligatoire",
-          acteurs: [{ actor: "Designer", role: "Design", cost: 150 }],
-          totalCost: 150,
+          acteurs: [{ actor: "Développeur", role: "Dev", cost: 0 }],
+          totalCost: 0,
         },
       ],
     },
@@ -189,26 +180,28 @@ export default function GestionDesFonctionnalitesPage() {
   const generatePDF = () => {
     const doc = new jsPDF();
 
-    let currentY = 10;
+    // Charger le logo
+    const img = "/logo-techtrust-blue.png"; // Assurez-vous que le logo est accessible dans public
+    doc.addImage(img, "PNG", 10, 10, 40, 20); // Position x, y, largeur, hauteur
+    let currentY = 40; // Position initiale après le logo
 
-    data.forEach((cat, catIndex) => {
-      // Titre de la catégorie
-      doc.setFontSize(14);
+    data.forEach((cat) => {
+      doc.setFont("courier", "normal");
       doc.text(cat.title, 10, currentY);
       currentY += 8;
 
       const rowsForPdf = cat.rows.map((row) => [
         row.feature,
         row.description,
-        `${row.criticite} ★`,
+        `${row.criticite} / 5`,
         row.statut,
         row.acteurs
           .map((actor) => `${actor.role}: (${actor.cost} €)`)
-          .join(", "),
+          .join("\n"),
         `${row.totalCost} €`,
       ]);
 
-      // Création du tableau
+      // Configuration du tableau avec gestion du texte long
       doc.autoTable({
         startY: currentY,
         head: [
@@ -225,15 +218,23 @@ export default function GestionDesFonctionnalitesPage() {
         styles: {
           fontSize: 10,
           cellPadding: 3,
+          overflow: "linebreak", // Gère les retours à la ligne
         },
         headStyles: {
-          fillColor: [76, 175, 80], // Vert
+          fillColor: [15, 23, 42], // Navy pour l'entête
+        },
+        columnStyles: {
+          0: { cellWidth: 30 }, // Largeur de la colonne "Fonctionnalité"
+          1: { cellWidth: 30 }, // Largeur de la colonne "Description"
+          2: { cellWidth: 20 }, // Largeur de la colonne "Criticité"
+          3: { cellWidth: 25 }, // Largeur de la colonne "Statut"
+          4: { cellWidth: 50 }, // Largeur de la colonne "Acteurs"
+          5: { cellWidth: 30 }, // Largeur de la colonne "Total Coût"
         },
         theme: "grid",
       });
 
       // Mise à jour Y pour la prochaine catégorie
-      // @ts-ignore
       currentY = doc.lastAutoTable.finalY + 10;
     });
 
@@ -242,17 +243,26 @@ export default function GestionDesFonctionnalitesPage() {
 
   // === Rendu JSX ===
   return (
-    <div className="mx-auto max-w-7xl p-4">
-      <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">
+    <div className="mx-auto max-w-7xl px-4 py-6">
+      <div className="mb-10">
+        <Image
+          src="/logo-techtrust-blue.png" // Chemin vers le logo
+          alt="Logo"
+          width={100}
+          height={100}
+          className="mr-4" // Ajoute une marge droite
+        />
+      </div>
+      <h1 className="text-3xl font-bold mb-8 text-gray-800">
         Gestion des Fonctionnalités
       </h1>
 
       <div className="flex flex-wrap gap-4 mb-8">
         <Button
           onClick={addCategory}
-          variant="default"
+          variant="primary"
           size="default"
-          className="flex items-center"
+          // On peut custom className si besoin
         >
           Ajouter une Catégorie
         </Button>
@@ -260,7 +270,7 @@ export default function GestionDesFonctionnalitesPage() {
           onClick={generatePDF}
           variant="secondary"
           size="default"
-          className="flex items-center"
+          className="bg-secondary text-secondary-foreground"
         >
           Générer le PDF
         </Button>
@@ -274,21 +284,21 @@ export default function GestionDesFonctionnalitesPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.3 }}
-            className="border border-gray-300 rounded-lg mb-8 bg-card dark:bg-gray-700 p-6 shadow-md"
+            className="mb-8 rounded-lg bg-white shadow"
           >
             {/* Header de catégorie */}
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center p-4 border-b border-gray-200 rounded-t-lg bg-primary text-primary-foreground">
               <input
                 type="text"
                 value={category.title}
                 onChange={(e) => updateCategoryTitle(catIndex, e.target.value)}
-                className="font-bold text-2xl border-b border-gray-300 dark:border-gray-600 focus:outline-none w-full mr-4 p-2 dark:bg-gray-600 dark:text-white rounded"
+                className="font-bold text-xl w-full mr-4 bg-transparent border-none outline-none"
               />
               <Button
                 onClick={() => deleteCategory(catIndex)}
                 variant="destructive"
                 size="sm"
-                className="flex items-center"
+                className="w-[20vw]"
               >
                 <FaTrash className="mr-2" />
                 Supprimer Catégorie
@@ -296,7 +306,7 @@ export default function GestionDesFonctionnalitesPage() {
             </div>
 
             {/* Tableau */}
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto p-4">
               <table className="min-w-full table-auto">
                 <thead>
                   <tr className="bg-primary text-primary-foreground">
@@ -313,12 +323,12 @@ export default function GestionDesFonctionnalitesPage() {
                   {category.rows.map((row, rowIndex) => (
                     <tr
                       key={rowIndex}
-                      className="border-b hover:bg-gray-50 dark:hover:bg-gray-600"
+                      className="border-b last:border-none hover:bg-gray-50"
                     >
                       {/* Feature */}
-                      <td className="px-4 py-2">
+                      <td className="px-4 py-3 align-top">
                         <textarea
-                          className="w-full border border-gray-300 dark:border-gray-600 p-2 rounded resize-none dark:bg-gray-600 dark:text-white"
+                          className="w-full border border-gray-200 p-2 rounded resize-none focus:outline-none focus:ring-2 focus:ring-accent"
                           value={row.feature}
                           onChange={(e) =>
                             updateRowValue(
@@ -333,9 +343,9 @@ export default function GestionDesFonctionnalitesPage() {
                       </td>
 
                       {/* Description */}
-                      <td className="px-4 py-2">
+                      <td className="px-4 py-3 align-top">
                         <textarea
-                          className="w-full border border-gray-300 dark:border-gray-600 p-2 rounded resize-none dark:bg-gray-600 dark:text-white"
+                          className="w-full border border-gray-200 p-2 rounded resize-none focus:outline-none focus:ring-2 focus:ring-accent"
                           value={row.description}
                           onChange={(e) =>
                             updateRowValue(
@@ -350,7 +360,7 @@ export default function GestionDesFonctionnalitesPage() {
                       </td>
 
                       {/* Criticité (rating) */}
-                      <td className="px-4 py-2">
+                      <td className="px-4 py-3 align-top">
                         <div className="flex items-center gap-1">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <FaStar
@@ -371,9 +381,9 @@ export default function GestionDesFonctionnalitesPage() {
                       </td>
 
                       {/* Statut (select) */}
-                      <td className="px-4 py-2">
+                      <td className="px-4 py-3 align-top">
                         <select
-                          className="w-full border border-gray-300 dark:border-gray-600 p-2 rounded dark:bg-gray-600 dark:text-white"
+                          className="w-full border border-gray-200 w-[9vw] p-2 rounded focus:outline-none focus:ring-2 focus:ring-accent"
                           value={row.statut}
                           onChange={(e) =>
                             updateRowValue(
@@ -390,7 +400,7 @@ export default function GestionDesFonctionnalitesPage() {
                       </td>
 
                       {/* Acteurs */}
-                      <td className="px-4 py-2">
+                      <td className="px-4 py-3 align-top">
                         {row.acteurs.map((actor, actorIndex) => (
                           <ActorRow
                             key={actorIndex}
@@ -407,22 +417,23 @@ export default function GestionDesFonctionnalitesPage() {
                           onClick={() => addActor(catIndex, rowIndex)}
                           variant="accent"
                           size="sm"
-                          className="mt-2 flex items-center"
+                          className="mt-2"
                         >
                           + Ajouter Acteur
                         </Button>
                       </td>
 
                       {/* Total Cost */}
-                      <td className="px-4 py-2">{row.totalCost} €</td>
+                      <td className="px-4 py-3 align-top font-semibold">
+                        {row.totalCost} €
+                      </td>
 
                       {/* Actions */}
-                      <td className="px-4 py-2">
+                      <td className="px-4 py-3 align-top">
                         <Button
                           onClick={() => deleteRow(catIndex, rowIndex)}
                           variant="destructive"
                           size="sm"
-                          className="flex items-center"
                         >
                           <FaTrash className="mr-2" />
                           Supprimer
@@ -434,12 +445,11 @@ export default function GestionDesFonctionnalitesPage() {
               </table>
             </div>
 
-            <div className="mt-6">
+            <div className="px-4 pb-4">
               <Button
                 onClick={() => addRow(catIndex)}
-                variant="default"
+                variant="primary"
                 size="default"
-                className="flex items-center"
               >
                 Ajouter une Ligne
               </Button>
